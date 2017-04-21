@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+ 
+ <!-- 
+ 使用Mapper映射器接口：
+
+需要注意的是  ：
+  1 在我们的映射文件中namespace一定要写成接口的包名加类名——接口完整的类名
+  2 映射的id要写成方法的名字
+ -->
+ 
+ <mapper namespace="com.joy.mybats.dao.IBookDao"> 
+ 
+ 	<select id="findById" parameterType="String" resultMap="book">
+       select * from book where id=#{id}       
+    </select>
+
+ <!--动态sql  -->
+ 	<!--1：if标签(多用)  -->
+ 	<select id="findByProperty1" parameterType="com.joy.mybats.entity.Book" resultMap="book">
+ 		 select * from book where 1=1  <!-- where 1=1 代表所有后，就所有的if下的内容统一加and，都不用加where -->
+ 		<if test="id!=null and id!=''">   <!--不能用&&代替and,在双引号中不再用双引号。数据库中null不等于空字符串''  -->
+       	 	and  id=#{id}
+       </if>
+        <if test="bookname!=null and bookname!=''">
+        	and BOOK_NAME=#{bookname}
+       </if>
+        <if test="bookauthor!=null and bookauthor!=''">
+        	and  BOOK_AUTHOR=#{bookauthor}
+       </if>
+ 	</select>
+ 	
+ 	<!--2：choose when(少用)  （类似if，if改为<when，比if标签外多了<choose>，<otherwise>） -->
+ 	<select id="findByProperty2" parameterType="com.joy.mybats.entity.Book" resultMap="book">
+ 		 select * from book where 1=1  <!-- where 1=1 代表所有后，就所有的if下的内容统一加and，都不用加where -->
+ 		<choose>
+ 			<when test="id!=null and id!=''">   <!--不能用&&代替and,在双引号中不再用双引号。数据库中null不等于空字符串''  -->
+       	 		and  id=#{id}
+	        </when>
+	        <when test="bookname!=null and bookname!=''">
+	        	and BOOK_NAME=#{bookname}
+	       </when>
+	       <when test="bookauthor!=null and bookauthor!=''">
+	        	and  BOOK_AUTHOR=#{bookauthor}
+	       </when>
+	       
+	       <otherwise>
+	       		and  id=5
+	       </otherwise>
+ 		
+ 		</choose>
+ 	</select>
+ 
+ 	<!--3:where标签(多用)  -->
+ 	<!--会智能添加where。并且能忽略多余的and /or，所以所有if内容都可以and /or开头
+ 		如果条件都不满足，则无where，就查出所有 -->
+ 	<select id="findByProperty3" parameterType="com.joy.mybats.entity.Book" resultMap="book">
+ 		 select * from book   <!--不用where 1=1  -->  
+ 		<where>  
+ 			<if test="id!=null and id!=''">   <!-- 会忽略 and /or所以都写上-->
+       	 		and  id=#{id}
+	       </if>
+	        <if test="bookname!=null and bookname!=''">
+	        	and BOOK_NAME=#{bookname}
+	       </if>
+	        <if test="bookauthor!=null and bookauthor!=''">
+	        	and  BOOK_AUTHOR=#{bookauthor}
+	       </if>		
+ 		</where>	
+ 	</select>
+ 
+ 
+ 	<!--4：trim标签(少用)  -->
+ 	<!-- prefix=""在包含的内容前加上某些前缀 ，则不用手动加where
+ 	suffixOverrides="and"在包含内容的尾部覆盖添加某些内。则包含内容就不用手动加and /or-->
+ 	<select id="findByProperty4" parameterType="com.joy.mybats.entity.Book" resultMap="book">
+ 		 select * from book 
+ 		<trim prefix="where" suffixOverrides="and"> 
+ 			<if test="id!=null and id!=''">   <!-- 会忽略 and /or所以都写上-->
+       	 		  id=#{id}
+	       </if>
+	        <if test="bookname!=null and bookname!=''">
+	        	 BOOK_NAME=#{bookname}
+	       </if>
+	        <if test="bookauthor!=null and bookauthor!=''">
+	        	  BOOK_AUTHOR=#{bookauthor}
+	       </if>			
+ 		</trim>
+ 	</select>
+ 
+ 	<!--5：set标签(多用) 用于修改操作 -->
+ 	<!--会智能添加set。并且只能忽略多余的逗号，所以所有if内容都可以 逗号结尾 （和where标签类似）
+ 		如果条件都不满足，会报错，合理  -->
+  	<update id="update" parameterType="com.joy.mybats.entity.Book">
+    	update book  
+    	<set>
+	        <if test="bookname!=null and bookname!=''">
+	        	 BOOK_NAME=#{bookname},
+	       </if>
+	        <if test="bookauthor!=null and bookauthor!=''">
+	        	  BOOK_AUTHOR=#{bookauthor},
+	       </if>	
+    	</set>
+         where id=#{id}
+  	</update>   <!--update book SET BOOK_NAME=?,BOOK_AUTHOR=? where id=?  -->
+ 
+ <!--6:foreach标签(多用)  主要用在构建in条件中  
+ 		item表示集合中每一个元素迭代时的别名；
+ 		open表示该语句以什么开始，
+ 		separator表示在每次进行迭代之间以什么符号作为分隔符，sql分隔符
+ 		close表示以什么结束
+ 		collection:
+ -->
+ 	<!--6-1：传入的是单参数且参数类型是一个array数组的时候：collection="array"  -->
+ 	<select  id="forEachArray" parameterType="String" resultMap="book">   <!-- 报错parameterType=String[]，可无parameterType -->
+        select * from book where id
+        in
+        <foreach collection="array" item="iid" open="(" separator="," close=")">
+           #{iid}
+        </foreach>
+    </select>  <!-- select * from book where id in ( ? , ? , ? ) -->
+ 
+ 	<!--6-2：传入的是单参数且参数类型是一个List的时候：collection="list"  -->
+ 	<select  id="forEachList" parameterType="String" resultMap="book">   <!-- 报错parameterType=String[]，可无parameterType -->
+        select * from book where id
+        in
+        <foreach collection="list" item="iid" open="(" separator="," close=")">
+           #{iid}
+        </foreach>
+    </select>
+ 
+ 	<!--6-3:传入的参数是多个的时候,也可以只传一个值  -->
+ 	<!-- 
+ 	就需要把它们封装成一个Map了，当然单参数也可以封装成map，
+ 	实际上如果你在传入参数的时候，在MyBatis里面也是会把它封装成一个Map的，map的key默认就是参数名，
+ 	所以这个时候collection属性值就是传入的List或array对象或者其他在封装的map里面的key
+ 	
+ 	 -->
+ 	<select  id="forEachMap"  resultMap="book">   <!-- 报错parameterType=String[]，可无parameterType -->
+ 		 select * from book where id
+ 		 in
+ 		 <foreach collection="mapKey1" item="iid" open="(" separator="," close=")">
+ 		 	#{iid}
+ 		 </foreach>	
+ 		 or id in
+ 		 <foreach collection="mapKey2" item="iid2" open="(" separator="," close=")">
+ 		 	#{iid2}
+ 		 </foreach>
+ 		 and BOOK_AUTHOR=#{mapKey3}
+ 	</select>
+ 	<!-- select * from book where id in ( ? , ? , ? ) or id in ( ? , ? ) 
+ 									and BOOK_AUTHOR=? -->
+ 
+ 
+ 
+ 	<resultMap type="com.joy.mybats.entity.Book" id="book">
+ 		<result property="id" column=""/>
+ 		<result property="bookname" column="BOOK_NAME"/>
+ 		<result property="bookauthor" column="BOOK_AUTHOR"/>
+ 	</resultMap>	
+ </mapper>
+ 
+ 
+ 
+ 
+ 
+ 
+ 

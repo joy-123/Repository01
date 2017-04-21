@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+ 
+ <!--  
+需要注意的是  ：
+  1 在我们的映射文件中namespace一定要写成接口的包名加类名——接口完整的类名
+  2 映射的id要写成方法的名字
+ -->
+ 
+ <mapper namespace="com.joy.xwb.dao.IAdminUserDao"> 
+	<!-- 开启二级缓存 -->
+	<!-- <cache></cache>  -->
+     <insert id="addUser" parameterType="com.joy.xwb.entity.AdminUser" >
+	     <selectKey keyProperty="userId"  resultType="String" order="BEFORE">  <!--主键返回的名字，返回的类型，在insert前/后 查询序列值  -->
+	     select to_char(ADMINUSERSEQ.nextval) from dual  <!-- 无；结束 -->
+	     </selectKey>
+        insert into ADMINUSER(userId,userName,userSex,userPassword,loginName)
+        values(#{userId},#{userName},#{userSex},#{userPassword},#{loginName})
+    </insert>
+    
+    
+    <!-- 或者直接?：
+    	insert into ADMINUSER(userId,userName,userSex,userPassword,loginName)
+        values(#{ADMINUSERSEQ.nextval},#{userName},#{userSex},#{userPassword},#{loginName}) 
+     -->
+     
+     
+  <!-- 
+  	如果数据库设置主键是自动增长的，（如mysql）则如下配置。在insert标签下添加useGeneratedKeys="true"和keyProperty="userId"属性，
+  	代表用JDBC的getGeneratedKey方法获取自增长的主键，并赋值到keyProperty设置的模型属性名中（sql中增加时不用增加主键）
+  	keyProperty:一定得和java实体对象的属性名称一致,而不是表格的字段名
+  	不用查序列值没有序列。 	
+  	<insert id="addUser" parameterType="com.joy.xwb.entity.AdminUser" useGeneratedKeys="true" keyProperty="userId">	     
+        insert into ADMINUSER(userName,userSex,userPassword,loginName)
+        values(#{userName},#{userSex},#{userPassword},#{loginName})
+    </insert>
+   需要注意的是：由于Oracle没有自增长一说法，只有序列这种模仿自增的形式，所以不能再使用“useGeneratedKeys”属性。
+而是使用<selectKey>将ID获取并赋值到对象的属性中，insert插入操作时正常插入id。
+   
+   -->
+  
+  
+  
+  
+    <select id="findByLoginName"   parameterType="string"  resultType="com.joy.xwb.entity.AdminUser">
+        select * from adminuser where loginName=#{name}
+    </select>
+    
+    
+    
+    <!-- 查询总记录数    用Map传参数（为以后扩展查询参数不是一个时使用） -->
+     <select id="getTotalRows" parameterType="map" resultType="int" >   <!-- parameterType="map" -->
+      	select count(*) from adminuser where state='1'  
+       <if test="name!=null">
+          and loginName like '%${name}%'
+       </if>
+    </select>
+    
+    
+    <!-- 分页查询名人列表 -->  <!-- 返回List<AdminUser> -->
+    <select id="findPageList"  parameterType="map" resultType="com.joy.xwb.entity.AdminUser" >  
+    	<if test="name!=null">
+	    	<![CDATA[	
+	    		select * from 
+		    		(
+		     	   select rownum n,t.*
+		     	   from adminuser t
+		     	   where 
+		     	   rownum<#{endRow} and state='1' and LoginName like '%${name}%'
+		     	   ) d
+	     	   where d.n>#{beginRow}
+	    	]]>    		
+     	</if>
+     	
+     	<if test="name==null">
+	    	<![CDATA[	
+	    		select * from 
+		    		(
+		     	   select rownum n,t.*
+		     	   from adminuser t
+		     	   where 
+		     	   rownum<#{endRow} and state='1' 
+		     	   ) d
+	     	   where d.n>#{beginRow}
+	    	]]>   		
+     	</if>  
+    </select>
+    <!-- 
+    	*分页查询的内层不能有rownum>#{beginRow},因为取出一个才从1排 序，就都不符合条件了。可放到外层
+    	*mybatis 的sql语句      like '%${name}%' ，用$代替#。或者：like'%'+ #{name}+'%' 
+    	* 大于号、小于号不能放在mybatis的xml文件的标签里，用<![CDATA[ sql语句 ]]>  把包含大于小于号的sql语句包起来
+    -->
+    
+    
+ </mapper>
+ 
+ 
+ 
+ 
+ 
+ 
+ 

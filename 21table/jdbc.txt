@@ -1,0 +1,81 @@
+		1、Java程序连接数据库   (18 TestJdbcConnection.java) 原始
+		2、简单封装 java连接数据库的程序(18 JdbcUtils.java)  开关连接
+		3、应用一个表的增删改查 (18 EmpDao,EmpDaoTest)
+		
+		4、进一步封装 jdbc connection  (19 JdbcUtilPro) 配置文件
+		5、java怎么调用数据库里的存储过程、函数、序列 (19 ProAndFun)
+		6、事务的控制   (19 DbTransaction)
+		7、数据的批处理  (19 EmpDao,EmpDaoTest)  (通过复制18 EmpDao,EmpDaoTest，再修改处理)
+			
+		8、深入封装 (20)
+			（1）用数据库的连接池来代替普通连接  连接池
+			（2）封装增删改查
+			（3）封装查询方法（初级）
+			（4）封装查询方法（高级——Spring）
+				 定义一个行映射的接口，通过传入的RseultSet对象将每一条记录映射成对应的对象
+	 			然后在业务查询方法中实现这个接口，将每列值赋给业务对象
+	 			
+	 			-------复习21----
+连接
+	*一个数据库的连接我们要具备四项条件  ，（Oracle和mysql的这四项的具体内容不同）
+	*一个是数据库的类型
+	*一个是数据库地址，
+	* 一个是访问数据库的用户名和密码
+设置参数
+把结果集放入java实体类对象中
+封装开链接（读取配置文件—--》连接池），关连接
+	进行数据库连接时需要注意：
+	*确保libs中架包已加载；
+	*数据库的类型、路径、用户名、密码不要写错，或者写错位置；
+	*如果sql语句需要参数，建议用PreparedStatement预编译句柄
+封装增删改
+封装查询方法	
+          --------MyEclipse操作-----
+*建项目
+	new java Project(或者new web Project) 项目名 选择jdk——
+*加载架包
+	项目下右键 new folder新建文件夹 名称“libs”——把架包ojdbc5.jar拷到该文件夹下
+ 项目下右键“properties”——“java build path”——“libraries” “add JARs...”  找到选择libs下的ojdbc5.jar架包 
+*抽取方法
+	 抽取方法 选择语句，右键“Refactor”（重构）--“Extract Method”（提取 方法）————方法名+public/其他
+*get set 方法赋值读取私有属性（右键——source-Generate getters and setters）	 
+*重写toString方法	 右键——source-Generate--Generate toString()...
+
+*新建空间
+当当前空间项目太多，导致太卡；或者为了方便项目管理，可以新建空间
+	file--switch workspace--other--新建空间名
+	新建空间后需要做三件事：
+		1、字体：		window--preferences--搜索“text”-“text fonts”--edit..  14~16号
+		2、编码格式：	window--preferences--搜索“workspaces”  UTF-8
+		3、注释模板：window--preferences--搜索“Code Templates” -- import-- ***.xml
+			Gomments -File、types...--edit --删除多余的格式
+		4.（可不用）文件默认打开方式：window--preferences--搜索“editors” --File Acc...--
+			*.xml->MyEclipse XML...->Default;
+			*.html->MyEclipse HTML...->Default;
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+
+
+
+
+
+
+
+
+
+	

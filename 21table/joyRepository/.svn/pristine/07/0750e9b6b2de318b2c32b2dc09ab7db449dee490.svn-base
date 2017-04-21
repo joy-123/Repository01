@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+	"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+	<!-- 1.引入约束，如上：  ，
+	之后根据提示添加<hibernate-configuration>标签及<session-factory>标签-->
+<hibernate-configuration>
+	<session-factory>
+		<!--2. 连接数据库四要素  数据库驱动 url username password --> <!--  -->
+		 <!--可通过hibernate.properties文件进行配置  -->   <!-- MYSQL -->
+		
+												  
+		<!--3.用c3p0的数据源连接方式  --> <!--  -->
+		<property name="hibernate.connection.provider_class">org.hibernate.c3p0.internal.C3P0ConnectionProvider</property>
+		
+		<!--4.数据库方言  --> <!--  -->
+		<property name="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</property>
+		<!-- <property name="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</property> --> <!-- MYSQL -->
+	
+		<!--5.session上下文  -->
+		<property name="hibernate.current_session_context_class">thread</property>
+				<!--5end,去新建 映射文件， -->
+		
+		<!--打印sql  --><!-- # true -->
+ 		<property name="hibernate.show_sql">true</property>
+ 		
+ 		<!--打印的sql格式化  --><!--hibernate.format_sql true  -->
+ 		<property name="hibernate.format_sql">true</property>
+ 		
+ 		<!--自动建表 create(每次与数据库交互前都删表再重建，少用)/update -->   <!--  -->
+ 		<property name="hibernate.hbm2ddl.auto">update</property>
+				
+		<!--最后：：加入映射文件路径  -->
+		<!-- <mapping resource="com/hibernatestudy/sysmanage/entity/country.hbm.xml"/>
+		<mapping resource="com/hibernatestudy/sysmanage/entity/area.hbm.xml"/>
+		
+		<mapping resource="com/hibernatestudy/sysmanage/entity/dept.hbm.xml"/>
+		
+		<mapping resource="com/hibernatestudy/sysmanage/entity/student.hbm.xml"/>
+		<mapping resource="com/hibernatestudy/sysmanage/entity/course.hbm.xml"/>
+		
+		<mapping resource="com/hibernatestudy/sysmanage/entity/user.hbm.xml"/> -->
+	
+		<!-- 注解持久化对象，不用映射文件后 -->
+		<mapping class="com.hibernatestudy.sysmanage.entity.User"/>
+		<mapping class="com.hibernatestudy.sysmanage.entity.Area"/>
+		<mapping class="com.hibernatestudy.sysmanage.entity.Country"/>
+		<mapping class="com.hibernatestudy.sysmanage.entity.Dept"/>
+		<mapping class="com.hibernatestudy.sysmanage.entity.Student"/>
+		<mapping class="com.hibernatestudy.sysmanage.entity.Course"/>
+			
+	</session-factory>
+</hibernate-configuration>	

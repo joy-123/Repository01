@@ -1,0 +1,20 @@
+
+AOP的切面做日志中
+   	通知方法中不能传其他参数，需要通过工具类获取session/HttpServletRequest中存有的信息
+   	怎么做？
+
+《1》新建工具类：如com.joy.xwb.util.SysContext
+	1：私有属性ThreadLocal并实例化线程池，并提供静态set方法（给外界调用把resquest/response放入给线程池保存）
+   		写一个过滤器配置过滤所有请求，调用这个类的set方法把请求中的resquest/response对象 放到线程池中
+	2：提供静态get方法（方便方法中没有传入request的等相关信息时，直接调用该工具类获取resquest/response里的信息
+《2》自定义过滤器 如com.joy.xwb.util.GetContextFilter
+	该过滤器，调用SysContext类的set方法  把请求中的resquest/response对象 放到线程池中
+《3》web.xml中配置过滤器：
+ 	<!--过滤所有请求，配在最前面，最先执行  -->
+ 	 <!-- 该自定义过滤器用于把请求中的resquest/response对象 放到线程池中保存 详情请看该过滤器-->
+《4》调用工具类的get方法直接获取resquest/response对象，从而获得里面的信息
+
+
+
+
+
