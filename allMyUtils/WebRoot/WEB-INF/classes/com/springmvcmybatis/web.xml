@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>mybatis01</display-name>
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+  
+  <!--过滤所有请求，陪在最前面，最先执行  -->
+  <!-- 该自定义过滤器用于把请求中的resquest/response对象 放到线程池中保存 详情请看该过滤器-->
+   <filter>
+     <filter-name>sessionFilter</filter-name>
+     <filter-class>com.joy.xwb.util.GetContextFilter</filter-class>
+  </filter>
+  <filter-mapping>
+     <filter-name>sessionFilter</filter-name>
+     <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  
+  
+  
+  
+   <!-- 配置springMVC入口，配置文件路径，启动优先级 -->
+  <servlet>
+  	<servlet-name>springMVC</servlet-name>
+  	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+  	<init-param>
+  		<param-name>contextConfigLocation</param-name>
+  		<param-value>classpath:applicationContext.xml</param-value>
+  	</init-param>
+  	<load-on-startup>1</load-on-startup>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>springMVC</servlet-name>
+  	<url-pattern>*.do</url-pattern> <!--匹配所有.do请求  -->
+  </servlet-mapping>
+  
+    <!-- 用sprig提供的过滤器解决post请求中文乱码问题： -->
+  <filter>
+  	<filter-name>characterEncodingFilter</filter-name>
+  	<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+  	<init-param>
+  		<param-name>encoding</param-name>
+  		<param-value>UTF-8</param-value>
+  	</init-param>
+  </filter>  
+  <filter-mapping>
+  	<filter-name>characterEncodingFilter</filter-name>
+  	<url-pattern>*.do</url-pattern>
+  </filter-mapping>
+  
+ 
+ <!-- applicationContext.xml中配置的异常处理不能捕获web框架的异常，需要再去web.xml中配置 -->
+ <!-- 捕获web框架的异常 /xwb/WebRoot/error.jsp，该异常在客户端报错后台不报错-->
+ <!-- 注意该jsp错误页要  page标签内添加 isErrorPage="true"属性。location路径写绝对路径-->
+    <error-page>  
+        <error-code>403</error-code>  
+        <location>/WEB-INF/page/error/xmlerror.jsp</location>  
+    </error-page>  
+    <error-page>  
+        <error-code>404</error-code>  
+        <location>/WEB-INF/page/error/xmlerror.jsp</location>  
+    </error-page>
+     <error-page>  
+        <error-code>500</error-code>  
+        <location>/WEB-INF/page/error/xmlerror.jsp</location>  
+    </error-page>
+    
+    <error-page>   
+        <exception-type>java.lang.Exception</exception-type>   
+        <location>/WEB-INF/page/error/xmlerror.jsp</location>   
+    </error-page>   
+      
+    <error-page>   
+        <exception-type>java.lang.Throwable</exception-type>   
+        <location>/WEB-INF/page/error/xmlerror.jsp</location>   
+    </error-page>  
+</web-app>
